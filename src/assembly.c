@@ -6,13 +6,11 @@
 // Primeira passada do montador
 void pass_one(FILE *entrada)
 {
-	
 }
 
 // Segunda passada do montador
 void pass_two(FILE *entrada, FILE *objeto)
 {
-	fseek(entrada, 0, SEEK_SET);
 }
 
 int main(int argc, char *argv[])
@@ -54,12 +52,7 @@ int main(int argc, char *argv[])
 	fclose(objeto);
 
 	if(verbose){ // Impressão de tabela de simbolos, caso seja modo verbose
-		printf("Tabela de simbolos:\n");
-		int i = 0;
-		while(symbol_table[i].in_use){
-			printf("%s %i\n", symbol_table[i].name, symbol_table[i].address);
-			i++;
-		}
+		
 	}
 
 	return 0;
