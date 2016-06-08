@@ -13,3 +13,6 @@ util.o:
 
 mkdirs:
 	mkdir $(Builds)
+
+run:
+	./tp2 tst/tp2ex1_fatorial.asm
