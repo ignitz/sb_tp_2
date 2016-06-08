@@ -3,6 +3,7 @@
 #include <string.h>
 #include "util.h"
 
+/*
 // Tabela de instrucoes
 Tabela_Opcodes opcode_table[25] = {
 	{"LOAD", 1, 2, 0}, {"STORE", 2, 2, 0}, {"READ",  3, 1, 0}, {"WRITE", 4, 1, 0},
@@ -77,6 +78,7 @@ int get_symbol_file(char *name)
 	while(i<1000 && strcmp(symbol_table[i].name, name)!=0) i++;
 	return (i==1000) ? -1 : symbol_table[i].file;
 }
+*/
 
 // Retorna a proxima linha de um stream
 char *get_next_line(FILE *f)

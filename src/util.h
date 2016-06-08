@@ -17,12 +17,12 @@ struct {
 	int file;
 } symbol_table[1000];
 
-int get_opcode_param_by_id_by_id(int id, int p);
-int get_opcode_param_by_name(char *name, int p);
-int get_symbol_address(char *name);
-int get_symbol_file(char *name);
-void initialize_symbol_table();
-void insert_symbol(char *name, int address, int file);
+// int get_opcode_param_by_id_by_id(int id, int p);
+// int get_opcode_param_by_name(char *name, int p);
+// int get_symbol_address(char *name);
+// int get_symbol_file(char *name);
+// void initialize_symbol_table();
+// void insert_symbol(char *name, int address, int file);
 char *get_next_line(FILE *f);
 
 #endif
