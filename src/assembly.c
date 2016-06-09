@@ -3,7 +3,7 @@
 #include <string.h>
 #include "util.h"
 
-#define DEBUG
+//#define DEBUG
 
 // Primeira passada do montador
 void pass_one(FILE *entrada) {
@@ -52,10 +52,15 @@ void pass_one(FILE *entrada) {
 
 // Segunda passada do montador
 // Varre de forma semelhante na primeira passada
-void pass_two(FILE *entrada, FILE *objeto) {
+void pass_two(FILE *entrada, FILE *objeto, int posicaoInicial) {
 	fseek(entrada, 0, SEEK_SET);
-
+	
 	char *line, *token;
+	int buffer;
+
+	// Insere a posição inicial do programa
+	fwrite(&posicaoInicial, 2, 1, objeto);
+
 	while(line = get_next_line(entrada)) {
 		token = strtok(line, CHAR_IGNORE);
 		while(token) {
@@ -68,19 +73,45 @@ void pass_two(FILE *entrada, FILE *objeto) {
 				// Aqui faço a análise da linha
 				switch(get_size(token)) {
 					case 2: // 16 bits
+						
+						#ifdef DEBUG
 						printf("Case 2 %s\n", token);
+						#endif
+						
+						buffer = get_opcode(token) << 8;
+						fwrite(&buffer, 2, 1, objeto);
 						break;
-					case 4:
+					case 4: // 32 bits
+						
+						#ifdef DEBUG
 						printf("Case 4 %s", token);
+						#endif
+
 						token = strtok(NULL, CHAR_IGNORE);
-						printf(" %s\n", token);
+						
+						#ifdef DEBUG
+						printf("\t%s\n", token);
+						#endif
+
 						break;
-					case 6:
+					case 6: // 48 bits
+
+						#ifdef DEBUG
 						printf("Case 6 %s", token);
+						#endif
+
 						token = strtok(NULL, CHAR_IGNORE);
-						printf(" %s ", token);
+
+						#ifdef DEBUG
+						printf("\t%s\t", token);
+						#endif
+
 						token = strtok(NULL, CHAR_IGNORE);
+						
+						#ifdef DEBUG
 						printf("%s\n", token);
+						#endif
+
 						break;
 					default:
 						printf("Exceção:\n");
@@ -137,7 +168,7 @@ int main(int argc, char *argv[]) {
 	FILE *objeto = fopen(s, "w+");
 
 	pass_one(entrada); // Passada 1 para definicao da tabela de simbolos
-	pass_two(entrada, objeto); // Codificacao com enderecos descomplicados
+	pass_two(entrada, objeto, 0); // Codificacao com enderecos descomplicados
 
 	fclose(entrada);
 	fclose(objeto);
