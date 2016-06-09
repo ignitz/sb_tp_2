@@ -4,6 +4,8 @@
 #define MAX_SYMBOL 1000
 #define MAX_OPCODE 0x14
 
+#define CHAR_IGNORE "\t ,"
+
 // Tabela de simbolos
 struct {
 	char name[16];
