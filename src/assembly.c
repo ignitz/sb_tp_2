@@ -56,7 +56,19 @@ void pass_two(FILE *entrada, FILE *objeto, int posicaoInicial) {
 	fseek(entrada, 0, SEEK_SET);
 	
 	char *line, *token;
-	int buffer;
+	int buffer,
+		operando1, operando2;
+
+	int flagOperando; // tipos de Operando
+	// 0  Nenhum operando 
+	// 1  Registrador 
+	// 2  Memória 
+	// 3  Registrador e memória 
+	// 4  Memória e Registrador 
+	// 5  Registrador e Registrador 
+	// 6  Memória e imediato (número)
+	// 7  Registrador e imediato (número) 
+	// 8  Imediato (número) 
 
 	// Insere a posição inicial do programa
 	fwrite(&posicaoInicial, 2, 1, objeto);
@@ -73,57 +85,113 @@ void pass_two(FILE *entrada, FILE *objeto, int posicaoInicial) {
 				// Aqui faço a análise da linha
 				switch(get_size(token)) {
 					case 2: // 16 bits
-						
-						#ifdef DEBUG
-						printf("Case 2 %s\n", token);
-						#endif
-						
 						buffer = get_opcode(token) << 8;
-						fwrite(&buffer, 2, 1, objeto);
+						flagOperando = 0;
 						break;
 					case 4: // 32 bits
 						
-						#ifdef DEBUG
-						printf("Case 4 %s", token);
-						#endif
-
+						buffer = get_opcode(token) << 8;
 						token = strtok(NULL, CHAR_IGNORE);
-						
-						#ifdef DEBUG
-						printf("\t%s\n", token);
-						#endif
 
+						// Falta implementar acesso a memória por variável
+						if (strcmp(token, "AL") == 0) {
+							operando1 = 0;
+							flagOperando = 1;
+						} else if (strcmp(token, "AH") == 0) {
+							operando1 = 1;
+							flagOperando = 1;
+						} else if (strcmp(token, "AX") == 0) {
+							operando1 = 2;
+							flagOperando = 1;
+						} else if (strcmp(token, "BH") == 0) {
+							operando1 = 3;
+							flagOperando = 1;
+						} else if (strcmp(token, "BL") == 0) {
+							operando1 = 4;
+							flagOperando = 1;
+						} else if (strcmp(token, "BX") == 0) {
+							operando1 = 5;
+							flagOperando = 1;
+						} else if (strcmp(token, "CL") == 0) {
+							operando1 = 6;
+							flagOperando = 1;
+						} else if (strcmp(token, "CH") == 0) {
+							operando1 = 7;
+							flagOperando = 1;
+						} else if (strcmp(token, "CX") == 0) {
+							operando1 = 8;
+							flagOperando = 1;
+						} else if (token[0] == '_') {
+							operando1 = get_symbol_address(token);
+							flagOperando = 8;
+						} else if (token[0] == '0' && token[1] == 'x') {
+							operando1 = get_hex_value(token);
+							flagOperando = 8;
+						}
+
+						buffer += flagOperando;
 						break;
 					case 6: // 48 bits
-
-						#ifdef DEBUG
-						printf("Case 6 %s", token);
-						#endif
-
+						buffer = get_opcode(token) << 8;
 						token = strtok(NULL, CHAR_IGNORE);
 
-						#ifdef DEBUG
-						printf("\t%s\t", token);
-						#endif
-
-						token = strtok(NULL, CHAR_IGNORE);
 						
-						#ifdef DEBUG
-						printf("%s\n", token);
-						#endif
 
+						token = strtok(NULL, CHAR_IGNORE);
+						// 3  Registrador e memória 
+						// 4  Memória e Registrador 
+						// 5  Registrador e Registrador 
+						// 6  Memória e imediato (número)
+						// 7  Registrador e imediato (número) 
+						buffer += flagOperando;
 						break;
 					default:
 						printf("Exceção:\n");
 						printf("token = %s\n", token);
+						fclose(objeto);
+						fclose(entrada);
 						exit(0);
 						break;
 				}
+
+				switch (flagOperando) {
+
+					case 0: // 0  Nenhum operando
+						fwrite(&buffer, 2, 1, objeto);
+						break;
+
+					case 1: // 1  Registrador
+					case 2: // 2  Memória
+					case 8: // 8  Imediato (número)
+						fwrite(&buffer, 2, 1, objeto);
+						fwrite(&operando1, 2, 1, objeto);
+						break;
+
+					case 3: // 3  Registrador e memória 
+					case 4: // 4  Memória e Registrador 
+					case 5: // 5  Registrador e Registrador 
+					case 6: // 6  Memória e imediato (número)
+					case 7: // 7  Registrador e imediato (número)
+						fwrite(&buffer, 2, 1, objeto);
+						fwrite(&operando1, 2, 1, objeto);
+						fwrite(&operando2, 2, 1, objeto);
+						break;
+
+					default: // Se der algum problema
+						printf("Erro em retorno de tipo de operando\n");
+						fclose(objeto);
+						fclose(entrada);
+						exit(0);
+						break;
+				}
+				fwrite(&buffer, 2, 1, objeto);
+
 			} else { // Caso ocorra algo inexpedado
 				printf("Exceção:\n");
 				printf("token = %s\n", token);
+				fclose(objeto);
+				fclose(entrada);
 				exit(0);
-				
 			}
 
 			token = strtok(NULL, CHAR_IGNORE);

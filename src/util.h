@@ -23,6 +23,8 @@ typedef struct {
 
 void initialize_symbol_table();
 void insert_symbol(char *name, int address, int file);
+int get_symbol_address(char *name);
+int get_hex_value(char *name);
 int get_opcode(char *name);
 int get_size(char *name);
 char *get_next_line(FILE *f);

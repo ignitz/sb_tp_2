@@ -49,6 +49,24 @@ void insert_symbol(char *name, int address, int file)
 	symbol_table[i].in_use = 1;
 }
 
+// Retorna o endereco de um simbolo da tabela
+int get_symbol_address(char *name)
+{
+	int i = 0;
+	while(i<1000 && strcmp(symbol_table[i].name, name)!=0) i++;
+	return (i==1000) ? -1 : symbol_table[i].address;
+}
+
+// Converte String HEX em Int
+// 0xA --> 10
+int get_hex_value(char *hexString)
+{
+	if (strlen(hexString) > 2)
+		return (int) strtol(hexString, NULL, 0);
+	else
+		return 0;
+}
+
 // Retorna um parametro de alguma instrucao da tabela de instrucoes
 // Recebe como entrada o nome do opcode
 int get_opcode(char *name)
