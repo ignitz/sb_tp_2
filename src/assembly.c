@@ -126,10 +126,10 @@ void pass_two(FILE *entrada, FILE *objeto, int posicaoInicial) {
 							flagOperando = 1;
 						} else if (token[0] == '_') {
 							operando1 = get_symbol_address(token);
-							flagOperando = 8;
+							flagOperando = 2;
 						} else if (token[0] == '0' && token[1] == 'x') {
 							operando1 = get_hex_value(token);
-							flagOperando = 8;
+							flagOperando = 2;
 						}
 
 						buffer += flagOperando;
