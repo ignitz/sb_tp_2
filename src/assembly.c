@@ -3,7 +3,7 @@
 #include <string.h>
 #include "util.h"
 
-//#define DEBUG
+#define DEBUG
 
 // Primeira passada do montador
 void pass_one(FILE *entrada) {
@@ -20,25 +20,12 @@ void pass_one(FILE *entrada) {
 			if (token[strlen(token)-1] == ':') { // É label
 				// Insere label na tabela de símbolos
 				token[strlen(token)-1] = '\0';
-
-				#ifdef DEBUG
-					printf("\n%s: ", token);
-				#endif
-
 				insert_symbol(token, location_counter, 0);
 			} else if (get_opcode(token) > 0){ // Verifica se é Opcode
-				
-				#ifdef DEBUG
-					printf("\n%s 0x%X %d", token, get_opcode(token), get_size(token));
-				#endif
-
 				location_counter += get_size(token);
 			} else { // Operandos
 				
 				// TODO Implementar variável na memória
-				#ifdef DEBUG
-					printf(" .%s ", token);
-				#endif
 
 			}
 			token = strtok(NULL, CHAR_IGNORE);
@@ -46,9 +33,6 @@ void pass_one(FILE *entrada) {
 		free(line);
 	}
 
-	#ifdef DEBUG
-		printf("\nlocation_counter = 0x%X\n", location_counter);
-	#endif
 }
 
 // Segunda passada do montador
@@ -129,7 +113,10 @@ void pass_two(FILE *entrada, FILE *objeto, int posicaoInicial) {
 							flagOperando = 2;
 						} else if (token[0] == '0' && token[1] == 'x') {
 							operando1 = get_hex_value(token);
-							flagOperando = 2;
+							flagOperando = 8;
+						} else {
+							// Aqui é a variável
+
 						}
 
 						buffer += flagOperando;
