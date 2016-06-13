@@ -3,8 +3,6 @@
 #include <string.h>
 #include "util.h"
 
-#define DEBUG
-
 int size_inst;
 
 // Primeira passada do montador
@@ -122,7 +120,7 @@ void pass_two(FILE *entrada, FILE *objeto, int posicaoInicial) {
 							operando1 = get_hex_value(token);
 							flagOperando = 8;
 						} else {
-							printf("%s = %X\n", token, get_symbol_address(token));
+							operando1 = get_symbol_address(token);
 							flagOperando = 2;
 						}
 
