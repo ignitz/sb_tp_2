@@ -9,7 +9,7 @@ int size_inst;
 void pass_one(FILE *entrada) {
 
 	initialize_symbol_table();
-	int location_counter = 2; // Posição de memória
+	int location_counter = 0; // Posição de memória
 	char *line, *token;
 	while(line = get_next_line(entrada)) {
 		token = strtok(line, CHAR_IGNORE);
