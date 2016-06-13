@@ -1,3 +1,5 @@
+DW varX ;Definindo variável
+MOV AX, varX ;Copiando variavel para AX
 READ BX ;Número que será fatorado
 JZ _zero ;Caso o valor entrado seja igual a zero
 MOV AX, BX ;AX receberá o resultado.

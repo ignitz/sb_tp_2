@@ -5,6 +5,8 @@
 
 #define DEBUG
 
+int size_inst;
+
 // Primeira passada do montador
 void pass_one(FILE *entrada) {
 
@@ -20,19 +22,18 @@ void pass_one(FILE *entrada) {
 			if (token[strlen(token)-1] == ':') { // É label
 				// Insere label na tabela de símbolos
 				token[strlen(token)-1] = '\0';
-				insert_symbol(token, location_counter, 0);
+				insert_symbol(token, location_counter);
 			} else if (get_opcode(token) > 0){ // Verifica se é Opcode
 				location_counter += get_size(token);
 			} else { // Operandos
 				
 				// TODO Implementar variável na memória
-
 			}
 			token = strtok(NULL, CHAR_IGNORE);
 		}
 		free(line);
 	}
-
+	size_inst = location_counter;
 }
 
 // Segunda passada do montador
@@ -66,10 +67,16 @@ void pass_two(FILE *entrada, FILE *objeto, int posicaoInicial) {
 			}
 			if (token[strlen(token)-1] == ':') {
 				// Ignora label
-			} else if (get_opcode(token) > 0) {
+			} else if (get_opcode(token) >= 0) {
 				// Aqui faço a análise da linha
 
 				switch(get_size(token)) {
+					case 0: // DW
+						token = strtok(NULL, CHAR_IGNORE);
+						insert_symbol(token, size_inst);
+						size_inst += 2;
+						flagOperando = -1;
+						break;
 					case 2: // 16 bits
 
 						buffer = get_opcode(token) << 8;
@@ -115,8 +122,8 @@ void pass_two(FILE *entrada, FILE *objeto, int posicaoInicial) {
 							operando1 = get_hex_value(token);
 							flagOperando = 8;
 						} else {
-							// Aqui é a variável
-
+							printf("%s = %X\n", token, get_symbol_address(token));
+							flagOperando = 2;
 						}
 
 						buffer += flagOperando;
@@ -155,6 +162,9 @@ void pass_two(FILE *entrada, FILE *objeto, int posicaoInicial) {
 						} else if (strcmp(token, "CX") == 0) {
 							operando1 = 8;
 							flagOperando = 1;
+						} else {
+							operando1 = get_symbol_address(token);
+							flagOperando = 2;
 						}
 
 						token = strtok(NULL, CHAR_IGNORE);
@@ -199,12 +209,20 @@ void pass_two(FILE *entrada, FILE *objeto, int posicaoInicial) {
 						} else if (token[0] == '0' && token[1] == 'x') {
 							operando2 = get_hex_value(token);
 							if (flagOperando == 1) flagOperando = 7; else if (flagOperando == 2) flagOperando = 6; else {printf("Erro no tipo de operandos\n"); exit(0);}
+						} else {
+							operando2 = get_symbol_address(token);
+							
+							// Válido apenas REG MEM
+							if (flagOperando == 1)
+								flagOperando = 3;
+							else
+								flagOperando = -1;
 						}
 
 						buffer += flagOperando;
 						break;
 					default:
-						printf("Exceção:\n");
+						printf("Exceção 1:\n");
 						printf("token = %s\n", token);
 						fclose(objeto);
 						fclose(entrada);
@@ -214,6 +232,8 @@ void pass_two(FILE *entrada, FILE *objeto, int posicaoInicial) {
 
 				// Passo da escrita no arquivo
 				switch (flagOperando) {
+					case -1: // DW
+						break;
 					case 0: // 0  Nenhum operando
 						fwrite(&buffer, 2, 1, objeto);
 						break;
@@ -241,7 +261,7 @@ void pass_two(FILE *entrada, FILE *objeto, int posicaoInicial) {
 				}
 
 			} else { // Caso ocorra algo inexpedado
-				printf("Exceção:\n");
+				printf("Exceção 2:\n");
 				printf("token = %s\n", token);
 				fclose(objeto);
 				fclose(entrada);

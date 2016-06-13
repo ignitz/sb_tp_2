@@ -24,7 +24,8 @@ Tabela_Opcodes opcode_table[MAX_OPCODE] = {
 	{"DUMP", 17, 2},
 	{"READ", 18, 4},
 	{"WRITE", 19, 4},
-	{"HLT", 20, 2}
+	{"HLT", 20, 2},
+	{"DW", 0, 0} // Utilizado para reservar memória
 };
 
 // Inicializa a tabela de simbolos
@@ -34,18 +35,16 @@ void initialize_symbol_table()
 	for(i=0; i<1000; i++){
 		symbol_table[i].address = 0;
 		symbol_table[i].in_use = 0;
-		symbol_table[i].file = 0;
 	}
 }
 
 // Insere um simbolo na tabela
-void insert_symbol(char *name, int address, int file)
+void insert_symbol(char *name, int address)
 {
 	int i = 0;
 	while(symbol_table[i].in_use) i++;
 	strcpy(symbol_table[i].name, name);
 	symbol_table[i].address = address;
-	symbol_table[i].file = file;
 	symbol_table[i].in_use = 1;
 }
 
